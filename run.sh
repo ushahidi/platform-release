@@ -42,7 +42,7 @@ build() {
   ## Untar bundles in a comman folder
   mkdir -p $release_target_folder
   mv $client_untar_path ${release_target_folder}/html
-  mv $api_untar_path ${release_target_folder}/platform
+  mv $api_untar_path ${release_target_folder}/html/platform
   #
   ## Configure the client to reach backend at '/platform'
   cat > ${release_target_folder}/html/config.js <<EOF
@@ -53,11 +53,15 @@ window.ushahidi = {
 };
 EOF
   #
+  # Add .htaccess files for apache2 users
+  cp /dist/api-htaccess ${release_target_folder}/html/platform/.htaccess
+  cp /dist/api-httpdocs-htaccess ${release_target_folder}/html/platform/httpdocs/.htaccess
+  mv ${release_target_folder}/html/rewrite.htaccess ${release_target_folder}/html/.htaccess
+  #
   ## Additional files for the release
   cp /dist/README.release.md ${release_target_folder}
   mkdir ${release_target_folder}/dist
   cp /dist/apache-vhost.conf ${release_target_folder}/dist
-  cp /dist/api-htaccess ${release_target_folder}/dist
 }
 
 bundle() {
@@ -65,7 +69,7 @@ bundle() {
 }
 
 write_platform_env() {
-  cat > /var/www/platform/.env <<EOF
+  cat > /var/www/html/platform/.env <<EOF
   DB_HOST=${MYSQL_HOST:-mysql}
   DB_NAME=${MYSQL_DATABASE:-ushahidi}
   DB_USER=${MYSQL_USER:-ushahidi}
@@ -77,13 +81,11 @@ EOF
 run() {
   # Install release folders in webroot
   rsync -ar --delete-after ${release_target_folder}/html/ /var/www/html/
-  rsync -ar --delete-after ${release_target_folder}/platform/ /var/www/platform/
+  #rsync -ar --delete-after ${release_target_folder}/platform/ /var/www/platform/
   #
   # Configure apache and .htaccess
   cp /dist/apache-vhost.conf /etc/apache2/sites-available/000-default.conf
   ( cd /etc/apache2/sites-enabled ; ln -s ../sites-available/000-default.conf . )
-  cp /dist/api-htaccess /var/www/platform/httpdocs/.htaccess
-  mv /var/www/html/rewrite.htaccess /var/www/html/.htaccess
   ( cd /etc/apache2/mods-enabled ; ln -s ../mods-available/rewrite.load . )
   #
   ## Configure platform environment ensure mysql connection and run migrations
@@ -91,7 +93,7 @@ run() {
   while ! nc -z $MYSQL_HOST 3306 ; do
     sleep 1;
   done 
-  ( cd /var/www/platform ; ./bin/phinx migrate -c application/phinx.php )
+  ( cd /var/www/html/platform ; ./bin/phinx migrate -c application/phinx.php )
   #
   ## Run apache (on foreground)
   chown -R www-data:www-data /var/www

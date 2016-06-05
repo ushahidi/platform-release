@@ -10,13 +10,5 @@ RewriteBase /platform
 	Deny From All
 </Files>
 
-# Uncomment to force redirection to https site.
-#RewriteCond %{HTTP:X-Forwarded-Proto} =http
-#RewriteRule ^(.*)$ https://%{HTTP_HOST}%{ENV:REWRITEBASE}$1 [R=301,L]
-
-# Allow any files or directories that exist to be displayed directly
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-
-# Rewrite all other URLs to index.php/URL
-RewriteRule .* index.php/$0 [PT]
+# Rewrite all other URLs to httpdocs
+RewriteRule .* httpdocs/$0 [PT]
