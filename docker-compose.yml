@@ -1,0 +1,24 @@
+version: "2"
+services:
+  ushahidi:
+    build: .
+    command: run
+    volumes:
+      - .tars:/tars
+    links:
+      - mysql
+    ports:
+      - 80:80
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_DATABASE: ushahidi
+      MYSQL_USER: ushahidi
+      MYSQL_PASSWORD: ushahidi
+  mysql:
+    build:
+      context: ./docker/mysql
+      dockerfile: Dockerfile
+    environment:
+      MYSQL_DATABASE: ushahidi
+      MYSQL_USER: ushahidi
+      MYSQL_PASSWORD: ushahidi
