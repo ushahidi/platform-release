@@ -22,8 +22,9 @@ The procedure will vary depending on your setup, but the requirements in all cas
 
 ### Apache2 + mod_php + mod_rewrite
 
-The `dist/` folder contains suggested configurations for the virtual host (`apache-vhost.conf`)
-and the `.htaccess` file to place in the `platform/` folder (`api-htaccess.conf`) of your setup.
+The `dist/` folder contains the suggested configurations for the virtual host (`apache-vhost.conf`),
+the  most important thing to note in that file is that `AllowOverride` must be set to `All` for your
+document root where the app has been unzipped.
 
 ### nginx + php-fpm
 

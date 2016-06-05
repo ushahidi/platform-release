@@ -62,6 +62,13 @@ EOF
   cp /dist/README.release.md ${release_target_folder}
   mkdir ${release_target_folder}/dist
   cp /dist/apache-vhost.conf ${release_target_folder}/dist
+  #
+  ## Adjust folder permissions
+  chown -R 0:0 ${release_target_folder}
+  find ${release_target_folder}/html -type d -a -exec chmod 555 \{\} \;
+  find ${release_target_folder}/html -type f -a -exec chmod -w \{\} \;
+  ( cd ${release_target_folder}/html/platform ;
+    chmod 0777 application/logs application/cache application/media/uploads )
 }
 
 bundle() {
@@ -81,7 +88,6 @@ EOF
 run() {
   # Install release folders in webroot
   rsync -ar --delete-after ${release_target_folder}/html/ /var/www/html/
-  #rsync -ar --delete-after ${release_target_folder}/platform/ /var/www/platform/
   #
   # Configure apache and .htaccess
   cp /dist/apache-vhost.conf /etc/apache2/sites-available/000-default.conf
@@ -96,7 +102,7 @@ run() {
   ( cd /var/www/html/platform ; ./bin/phinx migrate -c application/phinx.php )
   #
   ## Run apache (on foreground)
-  chown -R www-data:www-data /var/www
+  ( cd /var/www/html/platform ; chown -R www-data:www-data application/logs application/cache application/media/uploads )
   exec apachectl -DFOREGROUND
 }
 
