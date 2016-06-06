@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y \
       unzip \
       rsync \
       netcat-openbsd \
+      supervisor \
+      cron \
       git && \
     docker-php-ext-install curl json mcrypt mysqli pdo pdo_mysql && \
     docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
@@ -25,5 +27,6 @@ WORKDIR /var/www
 COPY run.sh /run.sh
 COPY build_env.sh /build_env.sh
 COPY dist/ /dist
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 ENTRYPOINT [ "/bin/bash", "/run.sh" ]

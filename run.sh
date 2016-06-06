@@ -101,9 +101,26 @@ run() {
   done 
   ( cd /var/www/html/platform ; ./bin/phinx migrate -c application/phinx.php )
   #
-  ## Run apache (on foreground)
+  ## Adjust permissions
   ( cd /var/www/html/platform ; chown -R www-data:www-data application/logs application/cache application/media/uploads )
-  exec apachectl -DFOREGROUND
+  #
+  ## Install crontab
+  local cron_file=$(tempfile)
+  touch /var/log/cronjobs.out
+  chmod 777 /var/log/cronjobs.out
+  cat > ${cron_file} <<EOF
+PATH=/usr/local/bin:/usr/bin:/bin
+SHELL=/bin/bash
+*/5 * * * * cd /var/www/html/platform && ./bin/ushahidi dataprovider outgoing 2>&1 >> /var/log/cronjobs.out
+*/5 * * * * cd /var/www/html/platform && ./bin/ushahidi dataprovider incoming 2>&1 >> /var/log/cronjobs.out
+*/5 * * * * cd /var/www/html/platform && ./bin/ushahidi savedsearch 2>&1 >> /var/log/cronjobs.out
+*/5 * * * * cd /var/www/html/platform && ./bin/ushahidi notification queue 2>&1 >> /var/log/cronjobs.out
+EOF
+  crontab -u www-data ${cron_file}
+  rm -f ${cron_file}
+  #
+  ## Run software (supervisord)
+  exec supervisord -n -c /etc/supervisor/conf.d/supervisord.conf
 }
 
 case "$1" in
