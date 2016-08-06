@@ -86,13 +86,31 @@ EOF
 }
 
 run() {
+  install_app
+  #
+  case "$SERVER_FLAVOR" in
+    apache2)
+      setup_apache
+      ;;
+    nginx)
+      setup_fpm
+      setup_nginx
+      ;;
+    *)
+      echo "Unknown server flavor! $SERVER_FLAVOR"
+      exit 1
+      ;;
+  esac
+  # Setup cron and supervisor
+  setup_cron
+  setup_supervisord
+  # Start supervisor
+  exec supervisord -n -c /etc/supervisor/supervisord.conf
+}
+
+install_app() {
   # Install release folders in webroot
   rsync -ar --delete-after ${release_target_folder}/html/ /var/www/html/
-  #
-  # Configure apache and .htaccess
-  cp /dist/apache-vhost.conf /etc/apache2/sites-available/000-default.conf
-  ( cd /etc/apache2/sites-enabled ; ln -s ../sites-available/000-default.conf . )
-  ( cd /etc/apache2/mods-enabled ; ln -s ../mods-available/rewrite.load . )
   #
   ## Configure platform environment ensure mysql connection and run migrations
   write_platform_env
@@ -103,7 +121,51 @@ run() {
   #
   ## Adjust permissions
   ( cd /var/www/html/platform ; chown -R www-data:www-data application/logs application/cache application/media/uploads )
+}
+
+setup_apache() {
+  # Configure apache and .htaccess
+  cp /dist/apache-vhost.conf /etc/apache2/sites-available/000-default.conf
+  ( cd /etc/apache2/sites-enabled ; ln -s ../sites-available/000-default.conf . )
+  ( cd /etc/apache2/mods-enabled ; ln -s ../mods-available/rewrite.load . )
   #
+  cat > /etc/supervisor/conf.d/apache2 <<EOF
+[program:apache2]
+autorestart=false  
+command=/usr/sbin/apache2ctl -DFOREGROUND  
+stdout_logfile=/dev/fd/1
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/fd/2
+stderr_logfile_maxbytes=0
+EOF
+}
+
+setup_fpm() {
+  cat > /etc/supervisor/conf.d/php-fpm <<EOF
+[program:phpfpm]
+autorestart=false  
+command=/usr/local/sbin/php-fpm
+stdout_logfile=/dev/fd/1
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/fd/2
+stderr_logfile_maxbytes=0
+EOF
+}
+
+setup_nginx() {
+  cp /dist/nginx-site.conf /etc/nginx/sites-available/default
+  cat > /etc/supervisor/conf.d/nginx <<EOF
+[program:nginx]
+autorestart=false  
+command=/usr/sbin/nginx -g "daemon off;"  
+stdout_logfile=/dev/fd/1
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/fd/2
+stderr_logfile_maxbytes=0
+EOF
+}
+
+setup_cron() {
   ## Install crontab
   local cron_file=$(tempfile)
   touch /var/log/cronjobs.out
@@ -119,8 +181,32 @@ EOF
   crontab -u www-data ${cron_file}
   rm -f ${cron_file}
   #
-  ## Run software (supervisord)
-  exec supervisord -n -c /etc/supervisor/conf.d/supervisord.conf
+  cat > /etc/supervisor/conf.d/cron <<EOF
+[program:cron]
+autorestart=false  
+command=cron -f
+
+[program:tail-cron]
+autorestart=false
+command=tail -f /var/log/cronjobs.out
+stdout_logfile=/dev/fd/1
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/fd/2
+stderr_logfile_maxbytes=0
+EOF
+}
+
+setup_supervisord() {
+  cat > /etc/supervisor/supervisord.conf <<EOF
+[supervisord]
+nodaemon=true  
+logfile = /var/log/supervisord.log  
+logfile_maxbytes = 50MB  
+logfile_backups=10
+
+[include]
+files = conf.d/*
+EOF
 }
 
 case "$1" in

@@ -1,4 +1,4 @@
-FROM php:5.5.35-apache
+FROM php:5.5.35-fpm
 
 RUN apt-get update && apt-get install -y \
       libfreetype6-dev \
@@ -13,7 +13,8 @@ RUN apt-get update && apt-get install -y \
       netcat-openbsd \
       supervisor \
       cron \
-      git && \
+      git \
+      nginx && \
     docker-php-ext-install curl json mcrypt mysqli pdo pdo_mysql && \
     docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
     docker-php-ext-install imap && \
@@ -28,6 +29,6 @@ COPY run.sh /run.sh
 COPY build_env.sh /build_env.sh
 COPY dist/ /dist
 
-ENV SERVER_FLAVOR apache2
+ENV SERVER_FLAVOR nginx
 
 ENTRYPOINT [ "/bin/bash", "/run.sh" ]
