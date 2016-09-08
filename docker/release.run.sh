@@ -23,7 +23,7 @@ ghr() {
 
 if ghr info --tag $GITHUB_VERSION ; then
   # release already exists
-  ghr edit --tag $GITHUB_VERSION --name $GITHUB_VERSION
+  echo "Release already exists, leave it alone"
 else
   # release has to be created
   ghr release --tag $GITHUB_VERSION --name $GITHUB_VERSION
