@@ -117,17 +117,23 @@ install_app() {
   while ! nc -z $MYSQL_HOST 3306 ; do
     sleep 1;
   done 
-  ( cd /var/www/html/platform ; ./bin/phinx migrate -c application/phinx.php )
-  #
-  ## Adjust permissions
-  ( cd /var/www/html/platform ; chown -R www-data:www-data application/logs application/cache application/media/uploads )
+  ( cd /var/www/html/platform ;
+    # Run migrations
+    ./bin/phinx migrate -c application/phinx.php 
+    #
+    ## Adjust permissions
+    chown -R www-data:www-data application/logs application/cache application/media/uploads
+    #
+    ## Adjust configuration files
+    sed -i -E -e 's%(base_url\s*[[:punct:]]+\s*).*$%\1'"=> '/platform',"'%' application/config/init.php
+  )
 }
 
 setup_apache() {
   # Configure apache and .htaccess
   cp /dist/apache-vhost.conf /etc/apache2/sites-available/000-default.conf
-  ( cd /etc/apache2/sites-enabled ; ln -s ../sites-available/000-default.conf . )
-  ( cd /etc/apache2/mods-enabled ; ln -s ../mods-available/rewrite.load . )
+  ( cd /etc/apache2/sites-enabled ; ln -sf ../sites-available/000-default.conf . )
+  ( cd /etc/apache2/mods-enabled ; ln -sf ../mods-available/rewrite.load . )
   #
   cat > /etc/supervisor/conf.d/apache2 <<EOF
 [program:apache2]
