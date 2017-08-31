@@ -183,6 +183,7 @@ SHELL=/bin/bash
 */5 * * * * cd /var/www/html/platform && ./bin/ushahidi dataprovider incoming 2>&1 >> /var/log/cronjobs.out
 */5 * * * * cd /var/www/html/platform && ./bin/ushahidi savedsearch 2>&1 >> /var/log/cronjobs.out
 */5 * * * * cd /var/www/html/platform && ./bin/ushahidi notification queue 2>&1 >> /var/log/cronjobs.out
+*/5 * * * * cd /var/www/html/platform && ./bin/ushahidi webhook send 2>&1 >> /var/log/cronjobs.out
 EOF
   crontab -u www-data ${cron_file}
   rm -f ${cron_file}
