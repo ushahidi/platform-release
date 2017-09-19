@@ -1,4 +1,4 @@
-FROM alpine:3.3
+FROM alpine:3.5
 MAINTAINER David Losada Carballo "davidlosada@ushahidi.com"
 
 RUN apk update && \
