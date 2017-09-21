@@ -62,6 +62,7 @@ EOF
   cp /dist/README.release.md ${release_target_folder}
   mkdir ${release_target_folder}/dist
   cp /dist/apache-vhost.conf ${release_target_folder}/dist
+  cp /dist/nginx-site.conf ${release_target_folder}/dist
   #
   ## Adjust folder permissions
   chown -R 0:0 ${release_target_folder}
