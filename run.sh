@@ -70,6 +70,10 @@ EOF
   find ${release_target_folder}/html -type f -a -exec chmod -w \{\} \;
   ( cd ${release_target_folder}/html/platform ;
     chmod 0777 application/logs application/cache application/media/uploads )
+  #
+  ## Adjust base_url for the platform api
+  ( cd ${release_target_folder}/html/platform ;
+    sed -i -E -e 's%(base_url\s*[[:punct:]]+\s*).*$%\1'"=> '/platform',"'%' application/config/init.php )
 }
 
 bundle() {
@@ -124,9 +128,6 @@ install_app() {
     #
     ## Adjust permissions
     chown -R www-data:www-data application/logs application/cache application/media/uploads
-    #
-    ## Adjust configuration files
-    sed -i -E -e 's%(base_url\s*[[:punct:]]+\s*).*$%\1'"=> '/platform',"'%' application/config/init.php
   )
 }
 
