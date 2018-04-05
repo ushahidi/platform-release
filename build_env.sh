@@ -1,6 +1,6 @@
-client_version=v3.9.1
-api_version=v3.9.0
-release_version=${CI_BRANCH:-v3.9.1}
+client_version=v3.10.0
+api_version=v3.10.0
+release_version=${CI_BRANCH:-v3.10.0}
 
 client_url=
 api_url=
