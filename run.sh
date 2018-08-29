@@ -136,6 +136,7 @@ setup_apache() {
   cp /dist/apache-vhost.conf /etc/apache2/sites-available/000-default.conf
   ( cd /etc/apache2/sites-enabled ; ln -sf ../sites-available/000-default.conf . )
   ( cd /etc/apache2/mods-enabled ; ln -sf ../mods-available/rewrite.load . )
+  ( cd /etc/apache2/mods-enabled ; ln -sf ../mods-available/headers.load . )
   #
   cat > /etc/supervisor/conf.d/apache2 <<EOF
 [program:apache2]
