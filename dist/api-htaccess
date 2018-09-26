@@ -12,3 +12,5 @@ RewriteBase /platform
 
 # Rewrite all other URLs to httpdocs
 RewriteRule .* httpdocs/$0 [PT]
+
+DirectoryIndex index.html index.php
