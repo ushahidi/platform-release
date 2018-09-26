@@ -28,6 +28,14 @@ fetch() {
   if [ ! -f /tars/$api_tar ]; then
     curl -L -o /tars/$api_tar $api_url
   fi
+  # Added download files size control
+  minsize=100000
+  size_client=$(stat -c%s /tars/"$client_tar")
+  size_api=$(stat -c%s /tars/"$api_tar")
+  if [ $size_client -lt $minsize ] || [ $size_api -lt $minsize ] ; then
+    echo "Error in downloaded file!"
+    exit 1
+  fi
 }
 
 build() {
