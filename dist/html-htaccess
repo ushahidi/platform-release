@@ -1,0 +1,29 @@
+RewriteEngine on
+
+# Uncomment to force redirection to https site.
+#RewriteCond %{HTTP:X-Forwarded-Proto} =http
+#RewriteRule ^(.*)$ https://%{HTTP_HOST}%{ENV:REWRITEBASE}$1 [R=301,L]
+
+# Forward /api/* , /oauth/* and /storage/* requests to the API folder
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteRule ^api/ /platform/httpdocs/ [PT]
+RewriteRule ^oauth/ /platform/httpdocs/ [PT]
+RewriteRule ^storage/(.+) /platform/storage/app/public/$1 [PT]
+
+Header set X-XSS-Protection "1; mode=block"
+
+# Set headers for config.json
+<Files "config.json">
+Header add Access-Control-Allow-Origin "*"
+Header add Access-Control-Allow-Methods "GET, POST, OPTIONS"
+Header add Access-Control-Allow-Headers "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range"
+Header add Access-Control-Expose-Headers "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range"
+
+Header add Access-Control-Max-Age "1728000" "expr=%{REQUEST_METHOD} == 'OPTIONS'"
+Header add Content-Type "text/plain charset=UTF-8" "expr=%{REQUEST_METHOD} == 'OPTIONS'"
+Header add Content-Length "0" "expr=%{REQUEST_METHOD} == 'OPTIONS'"
+</Files>
+
+# Any non existing paths to be rewritten to index.html (angular routing)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^.*$ /index.html  [PT,L]

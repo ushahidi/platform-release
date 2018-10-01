@@ -1,9 +1,9 @@
-FROM php:5.6.30-fpm
+FROM php:7.0.32-apache
 
 RUN apt-get update && apt-get install -y \
       libfreetype6-dev \
       libjpeg62-turbo-dev \
-      libpng12-dev \
+      libpng-dev \
       libmcrypt-dev \
       libc-client2007e-dev \
       libkrb5-dev \
@@ -13,8 +13,7 @@ RUN apt-get update && apt-get install -y \
       netcat-openbsd \
       supervisor \
       cron \
-      git \
-      nginx && \
+      git && \
     docker-php-ext-install curl json mcrypt mysqli pdo pdo_mysql && \
     docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
     docker-php-ext-install imap && \
@@ -22,13 +21,13 @@ RUN apt-get update && apt-get install -y \
     docker-php-ext-install gd && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-    
+
 WORKDIR /var/www
 
 COPY run.sh /run.sh
 COPY build_env.sh /build_env.sh
 COPY dist/ /dist
 
-ENV SERVER_FLAVOR nginx
+ENV SERVER_FLAVOR apache2
 
 ENTRYPOINT [ "/bin/bash", "/run.sh" ]

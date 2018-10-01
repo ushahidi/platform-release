@@ -1,18 +1,15 @@
-# Turn on URL rewriting
-RewriteEngine On
-
-# Set base directory
-RewriteBase /platform/httpdocs
-
 # Protect hidden files from being viewed
 <Files .*>
 	Order Deny,Allow
 	Deny From All
 </Files>
+<Files *>
+	Order allow,deny
+	Allow from all
+</Files>
 
-# Uncomment to force redirection to https site.
-#RewriteCond %{HTTP:X-Forwarded-Proto} =http
-#RewriteRule ^(.*)$ https://%{HTTP_HOST}%{ENV:REWRITEBASE}$1 [R=301,L]
+# Turn on URL rewriting
+RewriteEngine On
 
 # Allow any files or directories that exist to be displayed directly
 RewriteCond %{REQUEST_FILENAME} !-f

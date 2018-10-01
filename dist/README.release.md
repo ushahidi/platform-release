@@ -15,7 +15,7 @@ obtain user credentials with access to such database.
 
 ## Apache2 + mod\_php + mod\_rewrite
 
-1. Ensure `mod_rewrite` is installed and enabled in your apache server
+1. Ensure `mod_rewrite` and `mod_headers` are installed and enabled in your apache server
 
 2. Copy the contents of the unzipped ushahidi-platform-release-* folder into your document root.
 
@@ -26,22 +26,20 @@ obtain user credentials with access to such database.
 4. Create a `platform/.env` file with your database credentials, such as:
 
         DB_HOST=<address of your MySQL server>
-        DB_NAME=<name of the database in your server>
-        DB_USER=<user to connect to the database>
-        DB_PASS=<password to connect to the database>
-        DB_TYPE=MySQLi
+        DB_DATABASE=<name of the database in your server>
+        DB_USERNAME=<user to connect to the database>
+        DB_PASSWORD=<password to connect to the database>
 
 5. Run the database migrations, execute this command from the `platform` folder:
 
-        ./bin/phinx migrate -c application/phinx.php
+        ./bin/phinx migrate -c phinx.php
 
-6. Ensure that the folders `logs`, `cache` and `media/uploads` under `platform/application` are
-   all owned by the user that the web server is running as.
+6. Ensure that the folder `storage`is owned by the user that the web server is running as.
 
     * i.e. in Debian derived Linux distributions, this user is `www-data`, belonging to group `www-data`,
       so you would run:
 
-            chown -R www-data:www-data platform/application/{logs,cache,media/uploads}
+            chown -R www-data:www-data platform/storage
 
 7. Set up the cron jobs for tasks like receiving reports and sending e-mail messages.
 
@@ -49,13 +47,14 @@ obtain user credentials with access to such database.
     * Run the command `crontab -u www-data -e` and ensure the following lines are present in the crontab:
 
             MAILTO=<your email address for system alerts>
-            */5 * * * * cd <your document root>/platform && ./bin/ushahidi dataprovider outgoing >> /dev/null
-            */5 * * * * cd <your document root>/platform && ./bin/ushahidi dataprovider incoming >> /dev/null
-            */5 * * * * cd <your document root>/platform && ./bin/ushahidi savedsearch >> /dev/null
-            */5 * * * * cd <your document root>/platform && ./bin/ushahidi notification queue >> /dev/null
+            */5 * * * * cd <your document root>/platform && ./artisan datasource:outgoing >> /dev/null
+            */5 * * * * cd <your document root>/platform && ./artisan datasource:incoming >> /dev/null
+            */5 * * * * cd <your document root>/platform && ./artisan savedsearch:sync >> /dev/null
+            */5 * * * * cd <your document root>/platform && ./artisan notification:queue >> /dev/null
+            */5 * * * * cd <your document root>/platform && ./artisan webhook:send >> /dev/null
 
 8. Restart your apache web server and access your virtual host. You should see your website and be able to login with the credentials user name `admin` and password `admin`
-     * **Make sure to change the credentials. Specially if the website is exposed to be accessed by anyone other than you** 
+     * **Make sure to change the credentials. Specially if the website is exposed to be accessed by anyone other than you**
 
 ## nginx + php-fpm
 

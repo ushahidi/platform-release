@@ -3,7 +3,7 @@ services:
   ushahidi:
     build:
       context: .
-      dockerfile: Dockerfile.nginx
+      dockerfile: Dockerfile.apache
     command: run
     volumes:
       - .tars:/tars
