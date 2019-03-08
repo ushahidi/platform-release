@@ -1,4 +1,4 @@
-# Ushahidi Platform version 3 releases
+# Ushahidi Platform version 4 releases
 
 Install and run the Ushahidi Platform easily. No builds, no compiling.
 
@@ -23,3 +23,15 @@ installation you plan to have exposed)
 
 Versions of the software will be automatically downloaded for you, based on the contents
 of `build_env.sh` 
+
+Step 1: Clone the Repo
+
+`git clone https://github.com/ushahidi/platform-release.git`
+
+Step2 : Change to Ushahidi platform release directory 
+
+`cd platform-release/`
+
+Step3: Run docker-compose 
+
+`docker-compose up`
