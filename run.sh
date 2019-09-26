@@ -25,6 +25,14 @@ fetch() {
   if [ ! -d /tars ]; then
     mkdir /tars
   fi
+  # Verify previously fetched tars
+  if [[ -f /tars/$client_tar ]] && ! tar tfz /tars/$client_tar &> /dev/null; then
+    rm /tars/$client_tar
+  fi
+  if [[ -f /tars/$api_tar ]] && ! tar tfz /tars/$api_tar &> /dev/null; then
+    rm /tars/$api_tar
+  fi
+  # Fetch if not present
   if [ ! -f /tars/$client_tar ]; then
     curl -L -o /tars/$client_tar $client_url
   fi
