@@ -1,4 +1,4 @@
-FROM ushahidi/php-fpm-nginx:php-7.0
+FROM ushahidi/php-fpm-nginx:php-7.1
 
 WORKDIR /var/www
 
@@ -17,7 +17,7 @@ COPY build_env.sh /build_env.sh
 COPY dist/ /dist
 
 ENV SERVER_FLAVOR=nginx \
-    PHP_FPM_CONFIG=/etc/php/7.0/fpm \
-    PHP_FPM_PATH=/usr/sbin/php-fpm7.0
+    PHP_FPM_CONFIG=/etc/php/7.1/fpm \
+    PHP_FPM_PATH=/usr/sbin/php-fpm7.1
 
 ENTRYPOINT [ "/bin/bash", "/run.sh" ]

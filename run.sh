@@ -248,7 +248,7 @@ stderr_logfile_maxbytes=0
 
 [program:tail-phpfpm]
 autorestart=false
-command=tail -f /var/log/php7.0-fpm.log
+command=tail -f /var/log/php7.1-fpm.log
 stdout_logfile=/dev/fd/1
 stdout_logfile_maxbytes=0
 stderr_logfile=/dev/fd/2
