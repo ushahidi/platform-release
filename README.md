@@ -35,3 +35,7 @@ Step2 : Change to Ushahidi platform release directory
 Step3: Run docker-compose 
 
 `docker-compose up`
+
+# Other documentation
+
+For other documentation, please check out our [Developer and Contributor docs](https://docs.ushahidi.com/platform-developer-documentation/) !
