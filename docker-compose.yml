@@ -7,6 +7,7 @@ services:
       - .tars:/tars
     links:
       - mysql
+      - redis
     ports:
       - 80:80
     environment:
@@ -14,6 +15,9 @@ services:
       MYSQL_DATABASE: ushahidi
       MYSQL_USER: ushahidi
       MYSQL_PASSWORD: ushahidi
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CACHE_DRIVER: redis
   mysql:
     image: mysql:5.7
     environment:
@@ -21,4 +25,5 @@ services:
       MYSQL_DATABASE: ushahidi
       MYSQL_USER: ushahidi
       MYSQL_PASSWORD: ushahidi
- 
+  redis:
+    image: redis:4-alpine
