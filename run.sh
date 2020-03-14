@@ -132,8 +132,11 @@ DB_USERNAME=${MYSQL_USER:-ushahidi}
 DB_PASSWORD=${MYSQL_PASSWORD:-ushahidi}
 DB_TYPE=MySQLi
 
-CACHE_DRIVER=file
-QUEUE_DRIVER=sync
+CACHE_DRIVER=${CACHE_DRIVER:-array}
+QUEUE_DRIVER=${QUEUE_DRIVER:-sync}
+
+REDIS_HOST=${REDIS_HOST:-}
+REDIS_PORT=${REDIS_PORT:-}
 EOF
 }
 
@@ -157,6 +160,7 @@ run() {
   setup_api
   setup_cron
   setup_supervisord
+  setup_worker
   # Start supervisor
   exec supervisord -n -c /etc/supervisor/supervisord.conf
 }
@@ -194,6 +198,8 @@ install_app() {
     # Ensure lumen log file
     mkdir -p ${PLATFORM_API_HOME}/storage/logs
     touch ${PLATFORM_API_HOME}/storage/logs/lumen.log
+    # Ensure lumen tmp folder
+    mkdir -p ${PLATFORM_API_HOME}/storage/app/temp
     ## Adjust permissions
     chown -R www-data:www-data storage
   )
@@ -294,6 +300,28 @@ command=cron -f
 [program:tail-cron]
 autorestart=false
 command=tail -f /var/log/cronjobs.out
+stdout_logfile=/dev/fd/1
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/fd/2
+stderr_logfile_maxbytes=0
+EOF
+}
+
+setup_worker() {
+  cat > /etc/supervisor/conf.d/laravel-worker <<EOF
+[program:laravel-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php ${PLATFORM_API_HOME}/artisan queue:work --sleep=3 --tries=3 --timeout=60
+autostart=true
+autorestart=true
+user=www-data
+numprocs=2
+redirect_stderr=true
+stdout_logfile=${PLATFORM_API_HOME}/storage/logs/worker.log
+
+[program:tail-laravel-worker]
+autorestart=false
+command=tail -f ${PLATFORM_API_HOME}/storage/logs/worker.log
 stdout_logfile=/dev/fd/1
 stdout_logfile_maxbytes=0
 stderr_logfile=/dev/fd/2
