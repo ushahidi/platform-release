@@ -88,7 +88,7 @@ EOF
   #
   ## Additional files for the release
   cp /dist/README.release.md ${release_target_folder}
-  mkdir ${release_target_folder}/dist
+  mkdir -p ${release_target_folder}/dist
   cp /dist/apache-vhost.conf ${release_target_folder}/dist
   cp /dist/nginx-site.conf ${release_target_folder}/dist
   #
@@ -241,7 +241,7 @@ EOF
 }
 
 setup_fpm() {
-  mkdir /run/php
+  mkdir -p /run/php
   gen_fpm_www_pool_config > ${PHP_FPM_CONFIG}/pool.d/www.conf
   cat > /etc/supervisor/conf.d/php-fpm <<EOF
 [program:phpfpm]
