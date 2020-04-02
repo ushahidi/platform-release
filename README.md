@@ -63,6 +63,11 @@ file. In order to make that example work for you, please adjust a couple things:
   conventions. i.e. if your publishing URL is ushahidi.example.com , you will need to have
   `ushahidi.example.com.crt` and `ushahidi.example.com.key` files.
 
+Also note that you will need to run
+`docker-compose -f docker-compose.tls.yml ... rest of the command ...`,
+instead of plain `docker-compose`, or set the the `COMPOSE_FILE` environment variable
+to `docker-compose.tls.yml`.
+
 ### SSL/TLS with Let's Encrypt
 
 This should be fairly doable with a variation of the nginx-proxy approach described above.
