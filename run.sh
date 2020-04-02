@@ -94,7 +94,7 @@ EOF
   #
   ## Adjust folder permissions
   chown -R 0:0 ${release_target_folder}
-  find ${release_target_folder}/html -type d -a -exec chmod 555 \{\} \;
+  find ${release_target_folder}/html -type d -a -exec chmod 755 \{\} \;
   find ${release_target_folder}/html -type f -a -exec chmod -w \{\} \;
   ( cd ${release_target_folder}/html/platform ;
     if [ ! -d storage ]; then mkdir storage; fi;
