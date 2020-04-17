@@ -18,6 +18,8 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: "6379"
       CACHE_DRIVER: redis
+      # Setting this variable is required for the mobile app to work:
+      # SITE_URL: http://example.com
   mysql:
     image: mysql:5.7
     environment:

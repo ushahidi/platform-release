@@ -74,6 +74,18 @@ This should be fairly doable with a variation of the nginx-proxy approach descri
 
 Contributions welcome!
 
+# Connecting the mobile app
+
+Please note that the mobile app relies on the contents of the config.json file in order to
+connect to the API backend.
+
+In order to help the app find the backend, ensure that the key `backend_url` in the
+JSON file is set appropriately to the absolute public URL of your deployment
+(i.e. `"backend_url": "https://example.deployment.com"` )
+
+If you are running the Docker container, you may set this variable using the
+`SITE_URL` environment variable. (In the default install the site URL **is** the backend URL).
+
 # Other documentation
 
 For other documentation, please check out our [Developer and Contributor docs](https://docs.ushahidi.com/platform-developer-documentation/) !
