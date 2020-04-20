@@ -5,6 +5,7 @@ build:
   volumes:
     - .tars:/tars
     - ./tmp/out:/vols/out
+
 release:
   build:
     image: release
@@ -12,3 +13,8 @@ release:
   volumes:
     - ./tmp/out:/release
   encrypted_env_file: deployment.env.encrypted
+
+dockercfggen:
+  image: codeship/dockercfg-generator
+  add_docker: true
+  encrypted_env_file: docker.env.encrypted

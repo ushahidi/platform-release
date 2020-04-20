@@ -380,4 +380,7 @@ case "$1" in
     build
     run
     ;;
+  *)
+    exec "$@"
+    ;;
 esac

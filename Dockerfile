@@ -21,3 +21,4 @@ ENV SERVER_FLAVOR=nginx \
     PHP_FPM_PATH=/usr/sbin/php-fpm7.2
 
 ENTRYPOINT [ "/bin/bash", "/run.sh" ]
+CMD [ "run" ]

@@ -1,5 +1,9 @@
+# unnecessary stuff
 .tars
 tmp
+docker-compose.*
+*.encrypted
+.git
 
 # super secret stuff
 deployment.env
