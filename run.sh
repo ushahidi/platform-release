@@ -43,14 +43,32 @@ fetch() {
 
 gen_config_json() {
   local dir=$1
+
+  if [ -z "${SITE_URL}" ]; then
+    (
+      set +x
+      echo
+      echo "!!! MOBILE APP : Incomplete configuration !!!"
+      echo
+      echo "Please note that for the Ushahidi Mobile App to work with this"
+      echo "deployment, you will need to configure the SITE_URL environment"
+      echo "variable. You should provide the *absolute publicly available*"
+      echo "URL where you are publishing the site, i.e.:"
+      echo
+      echo "    docker run -e 'SITE_URL=https://site.example.com' ... ushahidi/platform-release:latest"
+      echo
+     ) >&2 ;
+    sleep 3;
+  fi
+
   cat > $dir/config.json <<EOF
 {
 "client_id": "ushahidiui",
 "client_secret": "35e7f0bca957836d05ca0492211b0ac707671261",
-"backend_url": "/",
+"backend_url": "${SITE_URL:-/}",
 "google_analytics_id": "",
 "intercom_app_id": "",
-"mapbox_api_key": "pk.eyJ1IjoidXNoYWhpZGkiLCJhIjoiY2lxaXRrbmF5MDdxNmZubmUyN2p6bms5biJ9.o7pmKDIN1EtwMBp1VIzITQ",
+"mapbox_api_key": "pk.eyJ1IjoidXNoYWhpZGkiLCJhIjoiY2lxaXUzeHBvMDdndmZ0bmVmOWoyMzN6NiJ9.CX56ZmZJv0aUsxvH5huJBw",
 "raven_url": ""
 }
 EOF
