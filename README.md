@@ -18,7 +18,7 @@ file will contain more specific instructions for installation.
 Requirements are `docker-engine` and `docker-compose`.
 
 Just run `docker-compose up` , the Ushahidi platform will be available at port 80 of your
-docker engine host. Default credentials: `admin / admin` (**do change these** for any
+docker engine host. Default credentials: `admin@example.com / admin` (**do change these** for any
 installation you plan to have exposed)
 
 Versions of the software will be automatically downloaded for you, based on the contents
