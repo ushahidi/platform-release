@@ -1,7 +1,0 @@
-.tars
-tmp
-
-# super secret stuff
-deployment.env
-codeship.aes
-docker.env
