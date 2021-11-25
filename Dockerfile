@@ -17,8 +17,8 @@ COPY build_env.sh /build_env.sh
 COPY dist/ /dist
 
 ENV SERVER_FLAVOR=nginx \
-    PHP_FPM_CONFIG=/etc/php/7.2/fpm \
-    PHP_FPM_PATH=/usr/sbin/php-fpm7.2
+    PHP_FPM_CONFIG=/etc/php/7.3/fpm \
+    PHP_FPM_PATH=/usr/sbin/php-fpm7.3
 
 ENTRYPOINT [ "/bin/bash", "/run.sh" ]
 CMD [ "run" ]
