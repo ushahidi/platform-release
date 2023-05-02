@@ -21,6 +21,10 @@ fi
 
 release_target_folder=/tmp/release/ushahidi-platform-release-${release_version}
 
+needs_fetch() {
+  [ ! -f /tars/$client_tar ] || [ ! -f /tars/$api_tar ]
+}
+
 fetch() {
   if [ ! -d /tars ]; then
     mkdir /tars
@@ -74,6 +78,10 @@ gen_config_json() {
 EOF
 }
 
+needs_build() {
+  [ ! -f ${release_target_folder}/.built ];
+}
+
 build() {
   mkdir -p /tmp/client
   tar -C /tmp/client -xz -f /tars/$client_tar
@@ -117,6 +125,7 @@ EOF
   ( cd ${release_target_folder}/html/platform ;
     if [ ! -d storage ]; then mkdir storage; fi;
     chmod -R 0775 storage )
+  touch ${release_target_folder}/.built
 }
 
 bundle() {
@@ -127,7 +136,7 @@ setup_api() {
   cat > /etc/supervisor/conf.d/api-log <<EOF
 [program:tail-api]
 autorestart=false
-command=tail -f ${PLATFORM_API_HOME}/storage/logs/lumen.log
+command=tail -f ${PLATFORM_API_HOME}/storage/logs/laravel.log
 stdout_logfile=/dev/fd/1
 stdout_logfile_maxbytes=0
 stderr_logfile=/dev/fd/2
@@ -159,7 +168,9 @@ EOF
 }
 
 run() {
-  install_app
+  if needs_install; then
+    install_app
+  fi
   #
   case "$SERVER_FLAVOR" in
     apache2)
@@ -181,6 +192,10 @@ run() {
   setup_worker
   # Start supervisor
   exec supervisord -n -c /etc/supervisor/supervisord.conf
+}
+
+needs_install() {
+  [ ! -f ${PLATFORM_HOME}/.installed ]
 }
 
 install_app() {
@@ -213,16 +228,17 @@ install_app() {
       chmod 770 storage/passport
       chmod 660 storage/passport/*.key
     fi
-    # Ensure lumen log file
+    # Ensure log files
     mkdir -p ${PLATFORM_API_HOME}/storage/logs
-    touch ${PLATFORM_API_HOME}/storage/logs/lumen.log
+    touch ${PLATFORM_API_HOME}/storage/logs/laravel.log
+    touch ${PLATFORM_API_HOME}/storage/logs/worker.log
     # Ensure lumen tmp folder
     mkdir -p ${PLATFORM_API_HOME}/storage/app/temp
     ## Adjust permissions
     chown -R www-data:www-data storage
   )
-
-
+  ## Mark installed
+  touch ${PLATFORM_HOME}/.installed
 }
 
 setup_apache() {
@@ -376,8 +392,8 @@ case "$1" in
     bundle
     ;;
   run)
-    fetch
-    build
+    needs_fetch && fetch || true;
+    needs_build && build || true;
     run
     ;;
   *)
