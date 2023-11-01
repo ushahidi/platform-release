@@ -13,12 +13,17 @@ RUN apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY run.sh /run.sh
+RUN $DOCKERCES_MANAGE_UTIL endpoint /run.sh
+
 COPY build_env.sh /build_env.sh
 COPY dist/ /dist
 
 ENV SERVER_FLAVOR=nginx \
     PHP_FPM_CONFIG=/etc/php/7.3/fpm \
-    PHP_FPM_PATH=/usr/sbin/php-fpm7.3
+    PHP_FPM_PATH=/usr/sbin/php-fpm7.3 \
+    PHP_FPM_LOGFILE=/var/log/php7.3-fpm.log \
+    IMAGE_MAX_SIZE=10000000 \
+    PHP_UPLOAD_MAX_FILESIZE=10M \
+    PHP_POST_MAX_SIZE=10M
 
-ENTRYPOINT [ "/bin/bash", "/run.sh" ]
 CMD [ "run" ]

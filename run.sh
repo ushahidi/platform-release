@@ -13,7 +13,7 @@ if [[ -z "$client_tar" || -z "$api_tar" ]]; then
 fi
 
 if [ -z "$client_url" ]; then
-  client_url="https://github.com/ushahidi/platform-client/releases/download/${client_version}/${client_tar}"
+  client_url="https://github.com/ushahidi/platform-client-mzima/releases/download/${client_version}/${client_tar}"
 fi
 if [ -z "$api_url" ]; then
   api_url="https://github.com/ushahidi/platform/releases/download/${api_version}/${api_tar}"
@@ -44,6 +44,8 @@ fetch() {
     curl -L -o /tars/$api_tar $api_url
   fi
 }
+
+
 
 gen_config_json() {
   local dir=$1
@@ -88,7 +90,7 @@ build() {
   mkdir -p /tmp/api
   tar -C /tmp/api -xz -f /tars/$api_tar
   #
-  local client_untar_path=/tmp/client/ushahidi-platform-client-bundle-${client_version}
+  local client_untar_path=/tmp/client
   local api_untar_path=/tmp/api/ushahidi-platform-bundle-${api_version}
   #
   ## Untar bundles in a common folder
@@ -96,11 +98,24 @@ build() {
   mv $client_untar_path ${release_target_folder}/html
   mv $api_untar_path ${release_target_folder}/html/platform
   #
-  ## Configure the client to reach backend at '/platform'
-  cat > ${release_target_folder}/html/config.js <<EOF
-window.ushahidi = {
-  backendUrl : "/"
-};
+  ## Configure the client to reach backend at '/api'
+  cat > ${release_target_folder}/html/env.json <<EOF
+{
+  "production": true,
+  "backend_url": "/",
+  "api_v3": "api/v3/",
+  "api_v5": "api/v5/",
+  "mapbox_api_key": "pk.eyJ1IjoidXNoYWhpZGkiLCJhIjoiY2lxaXUzeHBvMDdndmZ0bmVmOWoyMzN6NiJ9.CX56ZmZJv0aUsxvH5huJBw",
+  "default_locale": "en_US",
+  "oauth_client_id": "ushahidiui",
+  "oauth_client_secret": "35e7f0bca957836d05ca0492211b0ac707671261",
+  "export_polling_interval": 30000,
+  "gtm_key": "",
+  "intercom_appid": "",
+  "sentry_dsn": "",
+  "sentry_environment": "",
+  "sentry_debug_mode": false
+}
 EOF
   gen_config_json ${release_target_folder}/html
   #
@@ -154,10 +169,13 @@ APP_TIMEZONE=${APP_TIMEZONE:-UTC}
 
 DB_CONNECTION=mysql
 DB_HOST=${MYSQL_HOST:-mysql}
+DB_PORT=${MYSQL_PORT:-3306}
 DB_DATABASE=${MYSQL_DATABASE:-ushahidi}
 DB_USERNAME=${MYSQL_USER:-ushahidi}
 DB_PASSWORD=${MYSQL_PASSWORD:-ushahidi}
 DB_TYPE=MySQLi
+
+IMAGE_MAX_SIZE=${IMAGE_MAX_SIZE:-5242880}
 
 CACHE_DRIVER=${CACHE_DRIVER:-array}
 QUEUE_DRIVER=${QUEUE_DRIVER:-sync}
@@ -207,7 +225,7 @@ install_app() {
   # Create app_key
   if [ ! -f ${PLATFORM_API_HOME}/.env.app_key ]; then
     cat /dev/urandom | \
-      LC_ALL=C tr -cd 'A-Za-z0-9_\!\@\#\$\%\^\&\*\(\)-+=' | \
+      LC_ALL=C tr -cd 'A-Za-z0-9_\!\@\%\^\&\*\(\)-+=' | \
       fold -w 32 | \
       head -1 \
     > ${PLATFORM_API_HOME}/.env.app_key
@@ -219,8 +237,7 @@ install_app() {
   done
 
   ( cd ${PLATFORM_API_HOME} ;
-    # Run migrations
-    ./bin/phinx migrate -c phinx.php
+    set -x;
     # Generate passport keys
     if [ ! -f storage/passport/oauth-private.key ]; then
       mkdir -p storage/passport
@@ -228,6 +245,8 @@ install_app() {
       chmod 770 storage/passport
       chmod 660 storage/passport/*.key
     fi
+    # Run migrations
+    composer migrate
     # Ensure log files
     mkdir -p ${PLATFORM_API_HOME}/storage/logs
     touch ${PLATFORM_API_HOME}/storage/logs/laravel.log
@@ -277,6 +296,7 @@ EOF
 setup_fpm() {
   mkdir -p /run/php
   gen_fpm_www_pool_config > ${PHP_FPM_CONFIG}/pool.d/www.conf
+  touch ${PHP_FPM_LOGFILE}
   cat > /etc/supervisor/conf.d/php-fpm <<EOF
 [program:phpfpm]
 autorestart=false
@@ -288,7 +308,7 @@ stderr_logfile_maxbytes=0
 
 [program:tail-phpfpm]
 autorestart=false
-command=tail -f /var/log/php7.3-fpm.log
+command=tail -f ${PHP_FPM_LOGFILE}
 stdout_logfile=/dev/fd/1
 stdout_logfile_maxbytes=0
 stderr_logfile=/dev/fd/2
