@@ -1,11 +1,11 @@
-# Ushahidi Platform version 4 releases
+# Ushahidi Platform version 6 releases
 
 Install and run the Ushahidi Platform easily. No builds, no compiling.
 
 The Ushahidi platform is currently composed of two components:
 
 * The API ( [platform repository](https://github.com/ushahidi/platform) )
-* The client ( [platform-client repository](https://github.com/ushahidi/platform-client) )
+* The client ( [platform-client repository](https://github.com/ushahidi/platform-client-mzima) )
 
 ## Installation instructions
 
@@ -13,7 +13,9 @@ Proceed to download a releases available in the "Releases" tab of this repositor
 contain all the files necessary for running our software. The included `README.release.md`
 file will contain more specific instructions for installation.
 
-## Run locally with docker
+## Run with Docker
+
+This is an easy way to get started and get a fairly stable service running.
 
 Requirements are `docker-engine` and `docker-compose`.
 
@@ -36,7 +38,11 @@ Step3: Run docker-compose
 
 `docker-compose up`
 
-### SSL/TLS
+### Docker: Backups
+
+Run `./do_backup.sh` on this folder to make a backup of your database and uploaded files.
+
+### Docker: SSL/TLS
 
 1. You will need a folder with your certificates, and this should be mounted as a volume
    in your pertinent container.
@@ -68,13 +74,13 @@ Also note that you will need to run
 instead of plain `docker-compose`, or set the the `COMPOSE_FILE` environment variable
 to `docker-compose.tls.yml`.
 
-### SSL/TLS with Let's Encrypt
+### Docker: SSL/TLS with Let's Encrypt
 
 This should be fairly doable with a variation of the nginx-proxy approach described above.
 
 Contributions welcome!
 
-# Connecting the mobile app
+### Docker: Connecting the mobile app
 
 Please note that the mobile app relies on the contents of the config.json file in order to
 connect to the API backend.
@@ -88,4 +94,4 @@ If you are running the Docker container, you may set this variable using the
 
 # Other documentation
 
-For other documentation, please check out our [Developer and Contributor docs](https://docs.ushahidi.com/platform-developer-documentation/) !
+For other documentation, please check out our [Developer and Contributor docs](https://docs.ushahidi.com/platform-developer-documentation/v/dev-legacy-v3/development-and-code/setup_alternatives/platform_release_install/) !
