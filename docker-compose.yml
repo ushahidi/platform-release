@@ -1,6 +1,7 @@
 version: "2"
 services:
   ushahidi:
+    platform: linux/amd64
     build: .
     volumes:
       - .tars:/tars
@@ -20,6 +21,7 @@ services:
       # Setting this variable is required for the mobile app to work:
       # SITE_URL: http://example.com
   mysql:
+    platform: linux/amd64
     image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: root
