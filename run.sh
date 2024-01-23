@@ -218,7 +218,7 @@ needs_install() {
 
 install_app() {
   # Install release folders in webroot
-  rsync -ar --delete-after ${release_target_folder}/html/ ${PLATFORM_HOME}/
+  rsync -ar ${release_target_folder}/html/ ${PLATFORM_HOME}/
   #
   ## Configure platform environment ensure mysql connection and run migrations
   #
