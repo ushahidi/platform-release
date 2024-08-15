@@ -1,4 +1,4 @@
-FROM ushahidi/php-fpm-nginx:php-7.3
+FROM ushahidi/php-fpm-nginx:php-7.4.33
 
 WORKDIR /var/www
 
@@ -19,9 +19,9 @@ COPY build_env.sh /build_env.sh
 COPY dist/ /dist
 
 ENV SERVER_FLAVOR=nginx \
-    PHP_FPM_CONFIG=/etc/php/7.3/fpm \
-    PHP_FPM_PATH=/usr/sbin/php-fpm7.3 \
-    PHP_FPM_LOGFILE=/var/log/php7.3-fpm.log \
+    PHP_FPM_CONFIG=/etc/php/7.4/fpm \
+    PHP_FPM_PATH=/usr/sbin/php-fpm7.4 \
+    PHP_FPM_LOGFILE=/var/log/php7.4-fpm.log \
     IMAGE_MAX_SIZE=10000000 \
     PHP_UPLOAD_MAX_FILESIZE=10M \
     PHP_POST_MAX_SIZE=10M
