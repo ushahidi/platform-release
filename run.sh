@@ -185,10 +185,20 @@ REDIS_PORT=${REDIS_PORT:-}
 EOF
 }
 
+migrate() {
+  if needs_install; then
+    install_app
+  fi
+  # Run migrations
+  ( cd ${PLATFORM_API_HOME} && composer migrate ; )
+}
+
 run() {
   if needs_install; then
     install_app
   fi
+  # Run migrations
+  migrate;
   #
   case "$SERVER_FLAVOR" in
     apache2)
@@ -245,8 +255,6 @@ install_app() {
       chmod 770 storage/passport
       chmod 660 storage/passport/*.key
     fi
-    # Run migrations
-    composer migrate
     # Ensure log files
     mkdir -p ${PLATFORM_API_HOME}/storage/logs
     touch ${PLATFORM_API_HOME}/storage/logs/laravel.log
@@ -415,6 +423,11 @@ case "$1" in
     needs_fetch && fetch || true;
     needs_build && build || true;
     run
+    ;;
+  migrate)
+    needs_fetch && fetch || true;
+    needs_build && build || true;
+    migrate
     ;;
   *)
     exec "$@"

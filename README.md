@@ -17,9 +17,9 @@ file will contain more specific instructions for installation.
 
 This is an easy way to get started and get a fairly stable service running.
 
-Requirements are `docker-engine` and `docker-compose`.
+Requirements are `docker-engine` and `docker compose` (bundled with `docker-engine` in recent releases).
 
-Just run `docker-compose up` , the Ushahidi platform will be available at port 80 of your
+Just run `docker compose up` , the Ushahidi platform will be available at port 80 of your
 docker engine host. Default credentials: `admin@example.com / admin` (**do change these** for any
 installation you plan to have exposed)
 
@@ -36,7 +36,7 @@ Step2 : Change to Ushahidi platform release directory
 
 Step3: Run docker-compose 
 
-`docker-compose up`
+`docker compose up`
 
 ### Docker: Backups
 
@@ -91,6 +91,15 @@ JSON file is set appropriately to the absolute public URL of your deployment
 
 If you are running the Docker container, you may set this variable using the
 `SITE_URL` environment variable. (In the default install the site URL **is** the backend URL).
+
+### Running database migrations
+
+The database migrations will run automatically when the container starts for the first time and then after
+every restart.
+
+If you would like to run the migrations manually while the container is running, without needing a restart:
+
+`docker compose exec ushahidi /run.sh migrate`
 
 # Other documentation
 
