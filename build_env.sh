@@ -1,6 +1,6 @@
-client_version=v2025.04.0
+client_version=v2025.07.0
 api_version=v2025.04.0
-release_version=${RELEASE_VERSION:-v6.0.16}
+release_version=${RELEASE_VERSION:-v6.0.17}
 
 client_url=
 api_url=
