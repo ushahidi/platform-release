@@ -161,6 +161,7 @@ EOF
 
 write_platform_env() {
   local app_key=`cat ${PLATFORM_API_HOME}/.env.app_key`
+  if [ -n ${MYSQL_PASSWORD_FILE} ]; then MYSQL_PASSWORD=`cat ${MYSQL_PASSWORD_FILE}`; fi;
   cat > ${PLATFORM_API_HOME}/.env <<EOF
 APP_ENV=${APP_ENV:-local}
 APP_DEBUG=${APP_DEBUG:-false}
